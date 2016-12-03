@@ -853,17 +853,16 @@ static ssize_t store_##name (struct device *dev, \
 		struct device_attribute *attr, const char *buf, size_t size) \
 { \
 	struct mdnie_info *mdnie = dev_get_drvdata(dev); \
-	u8 value; \
-	int ret; \
+	int new_val; \
 \
-	ret = strict_strtoul(buf, 0, (unsigned long *)&value); \
+	strict_strtoul(buf, 0, (unsigned long *)&new_val); \
 \
-	if (value == 0) /* never allow turning a colour off completely */ \
-		value = 1; \
+	if (new_val == 0) /* never allow turning a colour off completely */ \
+		new_val = 1; \
 \
-	mdnie->name = value; \
+	mdnie->name = new_val; \
 \
-	set_mdnie_value(mdnie, 0); \
+	mdnie_update(mdnie); \
 \
 	return size; \
 }
@@ -888,7 +887,7 @@ static ssize_t store_rgb_adj_enable(struct device *dev,
 	ret = strict_strtoul(buf, 0, (unsigned long *)&value);
 
 	mdnie->rgb_adj_enable = (value != 0);
-	set_mdnie_value(mdnie, 0);
+	mdnie_update(mdnie);
 	return size;
 }
 #endif
